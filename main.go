@@ -122,9 +122,11 @@ func writeResults(results []Result, filename, format string) error {
 	case "xml":
 		encoder := xml.NewEncoder(file)
 		encoder.Indent("", "  ")
+		fmt.Fprintf(file, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
 		err = encoder.Encode(struct {
+			XMLName xml.Name `xml:"results"`
 			Results []Result `xml:"result"`
-		}{results})
+		}{Results: results})
 	case "csv":
 		writer := csv.NewWriter(file)
 		err = writer.Write([]string{"Domain", "IP"})
