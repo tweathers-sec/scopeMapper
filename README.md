@@ -14,7 +14,7 @@ ScopeMapper is a Go-based utility for penetration testers to correlate in-scope 
 1. Ensure you have Go installed (version 1.13+)
 2. Clone the repository:
    ```
-   git clone https://github.com/yourusername/scopemapper.git
+   git clone https://github.com/tweathers-sec/scopeMapper.git
    ```
 3. Navigate to the project directory:
    ```
