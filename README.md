@@ -14,23 +14,23 @@ ScopeMapper is a Go-based utility for penetration testers to correlate in-scope 
 1. Ensure you have Go installed (version 1.13+)
 2. Clone the repository:
 
-   ```
-   git clone https://github.com/tweathers-sec/scopeMapper.git
-   ```
+```
+git clone https://github.com/tweathers-sec/scopeMapper.git
+```
 
 3. Navigate to the project directory:
 
-   ```
-   cd scopemapper
-   ```
+```
+cd scopemapper
+```
 
 4. Build the binary:
 
-   ```
-   go mod init scopemapper
-   go mod tidy
-   go build -o scopemapper
-   ```
+```
+go mod init scopemapper
+go mod tidy
+go build -o scopemapper
+```
 
 ## Usage
 
@@ -59,30 +59,30 @@ ScopeMapper is a Go-based utility for penetration testers to correlate in-scope 
 
 1. Create a file `in_scope_ips.txt` with IP addresses and ranges:
 
-   ```
-   192.168.1.1
-   10.0.0.0/24
-   ```
+```
+192.168.1.1
+10.0.0.0/24
+```
 
 2. Create a file `potential_domains.txt` with subdomains/vhosts:
 
-   ```
-   subdomain1.example.com
-   subdomain2.example.com
-   ```
+```
+subdomain1.example.com
+subdomain2.example.com
+```
 
 3. Run ScopeMapper:
 
-   ```
-   ./scopemapper -ips in_scope_ips.txt -domains potential_domains.txt -output results.json -format json
-   ```
+```
+./scopemapper -ips in_scope_ips.txt -domains potential_domains.txt -output results.json -format json
+```
 
 4. Check the results in `results.json`
 
 5. Create an in-scope subdomains list from the results:
 
-   ```
-   ./scopemapper -portscan -input results.json -output inscope_subdomains.txt
-   ```
+```
+./scopemapper -portscan -input results.json -output inscope_subdomains.txt
+```
 
 6. Check the in-scope subdomains in `inscope_subdomains.txt`
