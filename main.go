@@ -18,7 +18,6 @@ type Result struct {
 }
 
 func main() {
-	// Define custom usage message
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Domain Scope Checker v1.0\n")
 		fmt.Fprintf(os.Stderr, "Author: tweathers-sec\n\n")
@@ -27,28 +26,24 @@ func main() {
 		flag.PrintDefaults()
 	}
 
-	// Define command-line flags
 	inScopeIPsFile := flag.String("ips", "", "File containing in-scope IP addresses/CIDRs")
 	potentialDomainsFile := flag.String("domains", "", "File containing potential in-scope vhosts/subdomains")
 	outputFile := flag.String("output", "", "Output file name")
 	outputFormat := flag.String("format", "txt", "Output format (txt, json, xml, csv)")
 	flag.Parse()
 
-	// Read in-scope hosts
 	inScopeHosts, err := readLines(*inScopeIPsFile)
 	if err != nil {
 		fmt.Println("Error reading in-scope IPs file:", err)
 		return
 	}
 
-	// Read potential domains
 	potentialDomains, err := readLines(*potentialDomainsFile)
 	if err != nil {
 		fmt.Println("Error reading potential domains file:", err)
 		return
 	}
 
-	// Process domains and check if they're in scope
 	var results []Result
 	for _, domain := range potentialDomains {
 		ips, err := net.LookupIP(domain)
@@ -63,7 +58,6 @@ func main() {
 		}
 	}
 
-	// Output results
 	if *outputFile != "" {
 		err = writeResults(results, *outputFile, *outputFormat)
 		if err != nil {
