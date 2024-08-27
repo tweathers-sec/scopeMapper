@@ -22,6 +22,8 @@ ScopeMapper is a Go-based utility for penetration testers to correlate in-scope 
    ```
 4. Build the binary:
    ```
+   go mod init scopemapper
+   go mod tidy
    go build -o scopemapper
    ```
 
