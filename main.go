@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -30,8 +31,25 @@ func main() {
 	potentialDomainsFile := flag.String("domains", "", "File containing potential in-scope vhosts/subdomains")
 	outputFile := flag.String("output", "", "Output file name")
 	outputFormat := flag.String("format", "txt", "Output format (txt, json, xml, csv)")
+	portScan := flag.Bool("portscan", false, "Create an in-scope subdomains txt file from a scopeMapper output file")
+	inputFile := flag.String("input", "", "Input file for portscan option")
 	flag.Parse()
 
+	if *portScan {
+		if *inputFile == "" {
+			fmt.Println("Error: -input flag is required when using -portscan")
+			return
+		}
+		err := createInScopeSubdomainsFile(*inputFile, *outputFile)
+		if err != nil {
+			fmt.Println("Error creating in-scope subdomains file:", err)
+			return
+		}
+		fmt.Println("In-scope subdomains file created successfully")
+		return
+	}
+
+	// Only read in-scope IPs and potential domains if not using -portscan
 	inScopeHosts, err := readLines(*inScopeIPsFile)
 	if err != nil {
 		fmt.Println("Error reading in-scope IPs file:", err)
@@ -145,4 +163,70 @@ func writeResults(results []Result, filename, format string) error {
 	}
 
 	return err
+}
+
+func createInScopeSubdomainsFile(inputFile, outputFile string) error {
+	results, err := readResultsFromFile(inputFile)
+	if err != nil {
+		return err
+	}
+
+	if outputFile == "" {
+		outputFile = "inscope_subdomains.txt"
+	}
+
+	file, err := os.Create(outputFile)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	for _, result := range results {
+		_, err := fmt.Fprintln(file, result.Domain)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func readResultsFromFile(filename string) ([]Result, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var results []Result
+
+	switch filepath.Ext(filename) {
+	case ".json":
+		decoder := json.NewDecoder(file)
+		err = decoder.Decode(&results)
+	case ".xml":
+		decoder := xml.NewDecoder(file)
+		var xmlResults struct {
+			Results []Result `xml:"result"`
+		}
+		err = decoder.Decode(&xmlResults)
+		results = xmlResults.Results
+	case ".txt", ".csv":
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			parts := strings.Split(scanner.Text(), ",")
+			if len(parts) == 2 {
+				results = append(results, Result{Domain: parts[0], IP: parts[1]})
+			}
+		}
+		err = scanner.Err()
+	default:
+		return nil, fmt.Errorf("unsupported file format: %s", filepath.Ext(filename))
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
